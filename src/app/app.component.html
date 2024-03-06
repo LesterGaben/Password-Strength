@@ -1,9 +1,4 @@
-<div class="password-container">
-  <div class="text-block">Check your password strength</div>
-  <input class="password-input" type="password" [(ngModel)]="password" (keyup)="checkPasswordStrength()" placeholder="Введіть пароль">
-  <div class="strength-container">
-    <div class="strength-bar" [style.background-color]="strengthColors[0]"></div>
-    <div class="strength-bar" [style.background-color]="strengthColors[1]"></div>
-    <div class="strength-bar" [style.background-color]="strengthColors[2]"></div>
-  </div>
-</div>
+<form [formGroup]="form">
+  <password-input formControlName="password"></password-input>
+  <password-strength-indicator [strengthColors]="strengthColors"></password-strength-indicator>
+</form>

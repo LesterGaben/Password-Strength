@@ -1,45 +1,31 @@
 import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { RouterOutlet } from '@angular/router';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { PasswordStrengthService } from './password-strength.service/password-strength.service';
+import { PasswordInputComponent } from './password-input/password-input.component';
+import { PasswordStrengthIndicatorComponent } from './password-strength-indicator/password-strength-indicator.component';
+
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, FormsModule],
+  imports: [PasswordInputComponent, PasswordStrengthIndicatorComponent, ReactiveFormsModule],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
   title = 'password-strength-app';
 
-  password: string = '';
-  emptyInputColors: string[] = ['gray', 'gray', 'gray'];
-  smallPasswordColors: string[] = ['red', 'red', 'red'];
-  easyPasswordColors: string[] = ['red', 'gray', 'gray'];
-  mediumPasswordColors: string[] = ['yellow', 'yellow', 'gray'];
-  strongPasswordColors: string[] = ['green', 'green', 'green'];
-  strengthColors: string[] = this.emptyInputColors;
+  form: FormGroup;
+  strengthColors: string[] = ['gray', 'gray', 'gray']; 
 
-  checkPasswordStrength() {
-    const length = this.password.length;
-    const hasLetters = /[a-zA-Z]+/.test(this.password);
-    const hasNumbers = /\d+/.test(this.password);
-    const hasSymbols = /[\W_]+/.test(this.password);
+  constructor(private fb: FormBuilder, private passwordStrength: PasswordStrengthService) {
+    this.form = this.fb.group({
+      password: ['']
+    });
 
-    if (length < 8 && length > 0) {
-      this.strengthColors = this.smallPasswordColors;
-    } else if (hasLetters && hasNumbers && hasSymbols) {
-      this.strengthColors = this.strongPasswordColors;
-    } else if ((hasLetters && hasNumbers) || (hasLetters && hasSymbols) || (hasNumbers && hasSymbols)) {
-      this.strengthColors = this.mediumPasswordColors;
-    }
-    else {
-      this.strengthColors = this.easyPasswordColors;
-    }
-
-    if(length == 0) {
-      this.strengthColors = this.emptyInputColors;
-    }
+    this.form.get('password')?.valueChanges.subscribe(password => {
+      this.strengthColors = this.passwordStrength.checkPasswordStrength(password);
+    });
   }
 
 }
